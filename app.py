@@ -8,7 +8,7 @@ import joblib
 model = joblib.load("adaboost_colorectal_model.pkl")
 
 # Title
-st.title("🧠 Colorectal Cancer 5-Year Survival Predictor")
+st.title("Colorectal Cancer 5-Year Survival Predictor")
 st.write("This app predicts the 5-year survival chance of a patient with colorectal cancer using an AdaBoost model.")
 
 def user_input():
@@ -53,9 +53,9 @@ if st.button("Predict Survival"):
     prob = model.predict_proba(input_df)[0][1]
 
     if prediction == 1:
-        st.success(f"🎉 Predicted to survive 5 years. Probability: {prob:.2%}")
+        st.success(f"Predicted to survive 5 years. Probability: {prob:.2%}")
     else:
-        st.error(f"⚠️ Not predicted to survive 5 years. Probability: {prob:.2%}")
+        st.error(f"Not predicted to survive 5 years. Probability: {prob:.2%}")
 
 st.subheader("Input Summary")
 st.write(input_df)
