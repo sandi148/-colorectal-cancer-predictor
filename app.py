@@ -4,8 +4,9 @@ import pandas as pd
 import numpy as np
 import joblib
 
-# Load trained model
+# Load trained model and encoder
 model = joblib.load("adaboost_colorectal_model.pkl")
+country_encoder = joblib.load("country_encoder.pkl")
 
 # Title
 st.title("Colorectal Cancer 5-Year Survival Predictor")
@@ -17,7 +18,7 @@ def user_input():
     mortality = st.selectbox("Mortality", ["Alive", "Deceased"])
     insurance = st.selectbox("Insurance Status", ["Insured", "Uninsured"])
     urban_rural = st.selectbox("Urban or Rural", ["Urban", "Rural"])
-    country = st.selectbox("Country", ["Country A", "Country B", "Country C"])  # Adjust as needed
+    country = st.selectbox("Country", country_encoder.classes_)
     incidence_rate = st.slider("Incidence Rate per 100K", 0, 100, 50)
     mortality_rate = st.slider("Mortality Rate per 100K", 0, 100, 50)
     healthcare_access = st.selectbox("Healthcare Access", ["Low", "Moderate", "High"])
@@ -27,13 +28,15 @@ def user_input():
     tumor_size = st.slider("Tumor Size (mm)", 0, 100, 30)
     tumor_category = st.selectbox("Tumor Size Category", ["Small", "Medium", "Large"])
 
+    country_encoded = country_encoder.transform([country])[0]
+
     data = {
         'Family_History': 1 if family_history == "Yes" else 0,
         'Alcohol_Consumption': 1 if alcohol == "Yes" else 0,
         'Mortality': 1 if mortality == "Deceased" else 0,
         'Insurance_Status': 1 if insurance == "Insured" else 0,
         'Urban_or_Rural': 1 if urban_rural == "Urban" else 0,
-        'Country': ["Country A", "Country B", "Country C"].index(country),
+        'Country': country_encoded,
         'Incidence_Rate_per_100K': incidence_rate,
         'Mortality_Rate_per_100K': mortality_rate,
         'Healthcare_Access': ["Low", "Moderate", "High"].index(healthcare_access),
@@ -53,7 +56,7 @@ if st.button("Predict Survival"):
     prob = model.predict_proba(input_df)[0][1]
 
     if prediction == 1:
-        st.success(f"Predicted to survive 5 years. Probability: {prob:.2%}")
+        st.success(f" Predicted to survive 5 years. Probability: {prob:.2%}")
     else:
         st.error(f"Not predicted to survive 5 years. Probability: {prob:.2%}")
 
